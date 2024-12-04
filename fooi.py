@@ -21,11 +21,8 @@ def main():
     imageLinkList = getImageLinkList(fileList)
     imageFileList = getImageFileList(vaultDir)
     # make deletion list a function I suppose?
-    deletionList = []
-    for imageFile in imageFileList:
-        file = Path(imageFile)
-        if file.name not in imageLinkList:
-            deletionList.append(file.name)
+    deletionList = getDeletionList(imageLinkList, imageFileList)
+
     logFiles(deleteDir, deletionList)
     moveFiles(vaultDir, deleteDir, deletionList)
     printFiles(deletionList)
@@ -80,6 +77,15 @@ def getImageLinkList(fileList):
                     imageList.append(image[0])
     
     return imageList
+
+def getDeletionList(imageLinkList, imageFileList):
+    deletionList = []
+    for imageFile in imageFileList:
+        file = Path(imageFile)
+        if file.name not in imageLinkList:
+            deletionList.append(file.name)
+    
+    return deletionList
 
 # functionalise the list stuff
 def getImageFileList(vaultDir):
