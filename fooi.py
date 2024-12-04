@@ -76,8 +76,8 @@ def getEmbedList(fileList):
         with open(file, 'r', encoding="utf-8") as f:
             match = re.findall(f"\[\[(.+?({extensions})).*?]]", f.read())
             if len(match) > 0:
-                for image in match:
-                    embedList.append(image[0])
+                for embed in match:
+                    embedList.append(embed[0])
     
     return embedList
 
@@ -93,7 +93,7 @@ def getDeletionList(embedLinkList, orphanedFileList):
 
 
 def filterDirectories(fileType):
-    return [item for item in VAULT_DIR.rglob(f"*.{fileType}") if set(item.parts).isdisjoint(SKIP_DIRS)]
+    return [file for file in VAULT_DIR.rglob(f"*.{fileType}") if set(file.parts).isdisjoint(SKIP_DIRS)]
 
 
 def getOrphanedFileList():
