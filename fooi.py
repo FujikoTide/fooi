@@ -17,6 +17,7 @@ DELETE_DIR = "DELETE"
 SKIP_DIRS = [DELETE_DIR, ".obsidian"]
 ORPHANED_FILE_EXTENSIONS = ["png", "jpg", "pdf", "webp"]
 
+
 def main():
     deleteDir = Path(VAULT_DIR / DELETE_DIR)
     fileList = getFileList()
@@ -79,6 +80,7 @@ def getEmbedList(fileList):
                     embedList.append(image[0])
     
     return embedList
+
 
 def getDeletionList(embedLinkList, orphanedFileList):
     deletionList = []
