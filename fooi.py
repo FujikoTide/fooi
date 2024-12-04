@@ -4,10 +4,7 @@
 
 # TODO:
 # add error checking where needed
-# add dry run mode
-# create delete folder according to delete folder path specified
 # add hard kill mode
-# toggle printing to console
 
 import argparse
 import json
@@ -25,7 +22,7 @@ parser = argparse.ArgumentParser(
     allow_abbrev=True
 )
 
-parser.add_argument("-p", "--path", required=False, default=Path.cwd())
+parser.add_argument("-p", "--path", required=True, default=Path.cwd())
 
 parser.add_argument("-dr", "--dryrun", required=False, action="store_true", default=False)
 
@@ -33,11 +30,11 @@ parser.add_argument("-l", "--logging", required=False, action="store_false", def
 
 parser.add_argument("-pr", "--print", required=False, action="store_true", default=False)
 
-parser.add_argument("-d", "--delpath", required=False, default="DELETE")
+parser.add_argument("-d", "--delpath", required=True, default="DELETE")
 
 parser.add_argument("-k", "--kill", required=False, action="store_true", default=False)
 
-parser.add_argument("-e", "--extensions", required=False, action="append")
+parser.add_argument("-e", "--extensions", required=True, action="append")
 
 
 args = parser.parse_args()
@@ -64,8 +61,6 @@ DELETE_DIR = deltarget_dir
 
 hardKillMode = args.kill
 extensions = args.extensions
-
-print(args)
 
 SKIP_DIRS = [DELETE_DIR, ".obsidian"]
 
@@ -113,10 +108,11 @@ def moveFiles(deletionList):
             print(f"File {destination} already exists.")
         else:
             source.unlink()
+        
+    print(f"Files to be deleted (moved to {DELETE_DIR} folder):\n")
 
 
 def printFiles(deletionList):
-    print(f"Files to be deleted (moved to {DELETE_DIR} folder):\n")
     for file in deletionList:
         print(file)
     
