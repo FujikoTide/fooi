@@ -13,7 +13,7 @@ import re
 
 # YOUR OBSIDIAN VAULT LOCATION GOES HERE !
 VAULT_DIR = Path(r"")
-DELETE_DIR = "DELETE"
+DELETE_DIR = "DELETE2"
 SKIP_DIRS = [DELETE_DIR, ".obsidian"]
 ORPHANED_FILE_EXTENSIONS = ["png", "jpg", "pdf", "webp"]
 
@@ -59,7 +59,7 @@ def moveFiles(deleteDir, deletionList):
 
 
 def printFiles(deletionList):
-    print("Files to be deleted (moved to DELETE folder):\n")
+    print(f"Files to be deleted (moved to {DELETE_DIR} folder):\n")
     for file in deletionList:
         print(file)
     
