@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 
 DELETEDIR = "DELETE"
-
+SKIP_DIRS = ["DELETE", ".obsidian"]
 
 def main():
     vaultDir = Path(r"")
@@ -85,19 +85,18 @@ def getImageLinkList(fileList):
 def getImageFileList(vaultDir):
     imageFileList = []
     # must be an iterable for isdisjoint to work
-    skipDir = [DELETEDIR]
     
-    pngList = [item for item in vaultDir.rglob("*.png") if set(item.parts).isdisjoint(skipDir)]
+    pngList = [item for item in vaultDir.rglob("*.png") if set(item.parts).isdisjoint(SKIP_DIRS)]
     if len(pngList) > 0:
         for file in pngList:
             imageFileList.append(file)
 
-    jpgList = [item for item in vaultDir.rglob("*.jpg") if set(item.parts).isdisjoint(skipDir)]
+    jpgList = [item for item in vaultDir.rglob("*.jpg") if set(item.parts).isdisjoint(SKIP_DIRS)]
     if len(jpgList) > 0:
         for file in jpgList:
             imageFileList.append(file)
 
-    pdfList = [item for item in vaultDir.rglob("*.pdf") if set(item.parts).isdisjoint(skipDir)]
+    pdfList = [item for item in vaultDir.rglob("*.pdf") if set(item.parts).isdisjoint(SKIP_DIRS)]
     if len(pdfList) > 0:
         for file in pdfList:
             imageFileList.append(file)
