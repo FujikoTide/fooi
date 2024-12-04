@@ -20,9 +20,7 @@ def main():
     fileList = getFileList(vaultDir)
     imageLinkList = getImageLinkList(fileList)
     imageFileList = getImageFileList(vaultDir)
-    # make deletion list a function I suppose?
     deletionList = getDeletionList(imageLinkList, imageFileList)
-
     logFiles(deleteDir, deletionList)
     moveFiles(vaultDir, deleteDir, deletionList)
     printFiles(deletionList)
