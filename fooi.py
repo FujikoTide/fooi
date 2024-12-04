@@ -20,13 +20,13 @@ parser = argparse.ArgumentParser(
     allow_abbrev=True
 )
 
-parser.add_argument("-p", "--path", required=True, default=Path.cwd())
+parser.add_argument("path")
+parser.add_argument("delpath")
+parser.add_argument("-e", "--extensions", required=True, action="append")
 parser.add_argument("-dr", "--dryrun", required=False, action="store_true", default=False)
 parser.add_argument("-l", "--logging", required=False, action="store_false", default=True)
 parser.add_argument("-pr", "--print", required=False, action="store_true", default=False)
-parser.add_argument("-d", "--delpath", required=True, default="DELETE")
 parser.add_argument("-k", "--kill", required=False, action="store_true", default=False)
-parser.add_argument("-e", "--extensions", required=True, action="append")
 
 args = parser.parse_args()
 
