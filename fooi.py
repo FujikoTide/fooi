@@ -53,15 +53,18 @@ hardKillMode = args.kill
 def main():
     fileList = getFileList()
     embedLinkList = getEmbedList(fileList)
-    orphanedFileList = getOrphanedFileList()
-    deletionList = getDeletionList(embedLinkList, orphanedFileList)
-    if logToFile and not dryRun:
-        logFiles(deletionList)
-    if not dryRun:
-        createDir()
-        moveFiles(deletionList)
-    if printToScreen:    
-        printFiles(deletionList)
+    prospectiveFileList = getProspectiveFileList()
+    deletionList = getDeletionList(embedLinkList, prospectiveFileList)
+    if len(deletionList) > 0: 
+        if logToFile and not dryRun:
+            logFiles(deletionList)
+        if not dryRun:
+            createDir()
+            moveFiles(deletionList)
+        if printToScreen:    
+            printFiles(deletionList)
+    else:
+        print("No orphaned files found.")
 
 
 def createDir():
@@ -119,10 +122,10 @@ def getEmbedList(fileList):
     return embedList
 
 
-def getDeletionList(embedLinkList, orphanedFileList):
+def getDeletionList(embedLinkList, prospectiveFileList):
     deletionList = []
 
-    for embedFile in orphanedFileList:
+    for embedFile in prospectiveFileList:
         file = Path(embedFile)
         if file.name not in embedLinkList:
             deletionList.append(file.name)
@@ -134,16 +137,16 @@ def filterFiles(fileType):
     return [file for file in VAULT_DIR.rglob(f"*.{fileType}") if set(file.parts).isdisjoint(SKIP_DIRS)]
 
 
-def getOrphanedFileList():
-    orphanedFileList = []
+def getProspectiveFileList():
+    prospectiveFileList = []
     
     for fileType in ORPHANED_FILE_EXTENSIONS:
         fileTypeList = filterFiles(fileType)
         if len(fileTypeList) > 0:
             for file in fileTypeList:
-                orphanedFileList.append(file)
+                prospectiveFileList.append(file)
 
-    return orphanedFileList
+    return prospectiveFileList
 
   
 if __name__ == "__main__":
