@@ -11,18 +11,19 @@ import json
 from pathlib import Path
 import re
 
-DELETEDIR = "DELETE"
-SKIP_DIRS = ["DELETE", ".obsidian"]
+VAULT_DIR = Path(r"")
+DELETE_DIR = "DELETE"
+SKIP_DIRS = [DELETE_DIR, ".obsidian"]
+ORPHANED_FILE_EXTENSIONS = ["png", "jpg", "pdf"]
 
 def main():
-    vaultDir = Path(r"")
-    deleteDir = Path(vaultDir / DELETEDIR)
-    fileList = getFileList(vaultDir)
-    imageLinkList = getImageLinkList(fileList)
-    imageFileList = getImageFileList(vaultDir)
-    deletionList = getDeletionList(imageLinkList, imageFileList)
+    deleteDir = Path(VAULT_DIR / DELETE_DIR)
+    fileList = getFileList()
+    embedLinkList = getImageLinkList(fileList)
+    orphanedFileList = getOrphanedFileList()
+    deletionList = getDeletionList(embedLinkList, orphanedFileList)
     logFiles(deleteDir, deletionList)
-    moveFiles(vaultDir, deleteDir, deletionList)
+    moveFiles(deleteDir, deletionList)
     printFiles(deletionList)
 
 
@@ -41,9 +42,9 @@ def logFiles(deleteDir, deletionList):
         json.dump(deletionList, deletionFile, indent=4, ensure_ascii=False)
 
 
-def moveFiles(vaultDir, deleteDir, deletionList):
+def moveFiles(deleteDir, deletionList):
     for file in deletionList:
-        source = vaultDir / file
+        source = VAULT_DIR / file
         destination = deleteDir / file
      
         try:
@@ -61,51 +62,45 @@ def printFiles(deletionList):
         print(file)
     
 
-def getFileList(vaultDir):
-    return list(vaultDir.rglob("*.md"))
+def getFileList():
+    return list(VAULT_DIR.rglob("*.md"))
 
 
 def getImageLinkList(fileList):
-    imageList = []
+    embedList = []
     for file in fileList:
         with open(file, 'r', encoding="utf-8") as f:
             match = re.findall("\[\[(.+?(png|jpg|pdf)).*?]]", f.read())
             if len(match) > 0:
                 for image in match:
-                    imageList.append(image[0])
+                    embedList.append(image[0])
     
-    return imageList
+    return embedList
 
-def getDeletionList(imageLinkList, imageFileList):
+def getDeletionList(embedLinkList, orphanedFileList):
     deletionList = []
-    for imageFile in imageFileList:
-        file = Path(imageFile)
-        if file.name not in imageLinkList:
+    for embedFile in orphanedFileList:
+        file = Path(embedFile)
+        if file.name not in embedLinkList:
             deletionList.append(file.name)
     
     return deletionList
 
-# functionalise the list stuff
-def getImageFileList(vaultDir):
-    imageFileList = []
-    # must be an iterable for isdisjoint to work
+
+def filterDirectories(fileType):
+    return [item for item in VAULT_DIR.rglob(f"*.{fileType}") if set(item.parts).isdisjoint(SKIP_DIRS)]
+
+
+def getOrphanedFileList():
+    orphanedFileList = []
     
-    pngList = [item for item in vaultDir.rglob("*.png") if set(item.parts).isdisjoint(SKIP_DIRS)]
-    if len(pngList) > 0:
-        for file in pngList:
-            imageFileList.append(file)
+    for fileType in ORPHANED_FILE_EXTENSIONS:
+        fileTypeList = filterDirectories(fileType)
+        if len(fileTypeList) > 0:
+            for file in fileTypeList:
+                orphanedFileList.append(file)
 
-    jpgList = [item for item in vaultDir.rglob("*.jpg") if set(item.parts).isdisjoint(SKIP_DIRS)]
-    if len(jpgList) > 0:
-        for file in jpgList:
-            imageFileList.append(file)
-
-    pdfList = [item for item in vaultDir.rglob("*.pdf") if set(item.parts).isdisjoint(SKIP_DIRS)]
-    if len(pdfList) > 0:
-        for file in pdfList:
-            imageFileList.append(file)
-
-    return imageFileList
+    return orphanedFileList
 
   
 if __name__ == "__main__":
