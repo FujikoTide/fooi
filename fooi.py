@@ -13,7 +13,7 @@ import re
 
 # YOUR OBSIDIAN VAULT LOCATION GOES HERE !
 VAULT_DIR = Path(r"")
-DELETE_DIR = "DELETE2"
+DELETE_DIR = "DELETE"
 SKIP_DIRS = [DELETE_DIR, ".obsidian"]
 ORPHANED_FILE_EXTENSIONS = ["png", "jpg", "pdf", "webp"]
 
@@ -84,6 +84,7 @@ def getEmbedList(fileList):
 
 def getDeletionList(embedLinkList, orphanedFileList):
     deletionList = []
+
     for embedFile in orphanedFileList:
         file = Path(embedFile)
         if file.name not in embedLinkList:
