@@ -20,7 +20,7 @@ ORPHANED_FILE_EXTENSIONS = ["png", "jpg", "pdf"]
 def main():
     deleteDir = Path(VAULT_DIR / DELETE_DIR)
     fileList = getFileList()
-    embedLinkList = getImageLinkList(fileList)
+    embedLinkList = getEmbedList(fileList)
     orphanedFileList = getOrphanedFileList()
     deletionList = getDeletionList(embedLinkList, orphanedFileList)
     logFiles(deleteDir, deletionList)
@@ -67,7 +67,7 @@ def getFileList():
     return list(VAULT_DIR.rglob("*.md"))
 
 
-def getImageLinkList(fileList):
+def getEmbedList(fileList):
     embedList = []
     for file in fileList:
         with open(file, 'r', encoding="utf-8") as f:
