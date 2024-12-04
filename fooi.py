@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 import re
 
+# YOUR OBSIDIAN VAULT LOCATION GOES HERE !
 VAULT_DIR = Path(r"")
 DELETE_DIR = "DELETE"
 SKIP_DIRS = [DELETE_DIR, ".obsidian"]
