@@ -15,7 +15,7 @@ import re
 VAULT_DIR = Path(r"")
 DELETE_DIR = "DELETE"
 SKIP_DIRS = [DELETE_DIR, ".obsidian"]
-ORPHANED_FILE_EXTENSIONS = ["png", "jpg", "pdf"]
+ORPHANED_FILE_EXTENSIONS = ["png", "jpg", "pdf", "webp"]
 
 def main():
     deleteDir = Path(VAULT_DIR / DELETE_DIR)
@@ -69,9 +69,11 @@ def getFileList():
 
 def getEmbedList(fileList):
     embedList = []
+    extensions = "|".join(ORPHANED_FILE_EXTENSIONS)
+
     for file in fileList:
         with open(file, 'r', encoding="utf-8") as f:
-            match = re.findall("\[\[(.+?(png|jpg|pdf)).*?]]", f.read())
+            match = re.findall(f"\[\[(.+?({extensions})).*?]]", f.read())
             if len(match) > 0:
                 for image in match:
                     embedList.append(image[0])
