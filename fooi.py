@@ -7,6 +7,7 @@
 # add error checking where needed
 # add dry run mode
 
+import argparse
 import json
 from pathlib import Path
 import re
@@ -16,6 +17,33 @@ VAULT_DIR = Path(r"")
 DELETE_DIR = "DELETE"
 SKIP_DIRS = [DELETE_DIR, ".obsidian"]
 ORPHANED_FILE_EXTENSIONS = ["png", "jpg", "pdf", "webp"]
+
+
+parser = argparse.ArgumentParser(
+    prog="fooi", 
+    description="Finds files orphaned when notes are deleted in Obsidian.", 
+    epilog="Thank you for using fooi !",
+    add_help=True, 
+    allow_abbrev=True
+)
+
+parser.add_argument("-p", "--path", required=False, default=Path.cwd())
+
+parser.add_argument("-d", "--dry-run", required=False, action="store_true", default=False)
+
+args = parser.parse_args()
+
+target_dir = Path(args.path)
+
+if not target_dir.exists():
+    print("The target directory doesn't exist")
+    raise SystemExit(1)
+else:
+    VAULT_DIR = target_dir
+    print(VAULT_DIR)
+
+
+
 
 
 def main():
