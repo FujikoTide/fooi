@@ -11,8 +11,6 @@ import json
 from pathlib import Path
 import re
 
-ORPHANED_FILE_EXTENSIONS = ["png", "jpg", "pdf", "webp"]
-
 
 parser = argparse.ArgumentParser(
     prog="fooi", 
@@ -23,24 +21,16 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument("-p", "--path", required=True, default=Path.cwd())
-
 parser.add_argument("-dr", "--dryrun", required=False, action="store_true", default=False)
-
 parser.add_argument("-l", "--logging", required=False, action="store_false", default=True)
-
 parser.add_argument("-pr", "--print", required=False, action="store_true", default=False)
-
 parser.add_argument("-d", "--delpath", required=True, default="DELETE")
-
 parser.add_argument("-k", "--kill", required=False, action="store_true", default=False)
-
 parser.add_argument("-e", "--extensions", required=True, action="append")
-
 
 args = parser.parse_args()
 
 target_dir = Path(args.path)
-
 if not target_dir.exists():
     print("The target directory doesn't exist")
     raise SystemExit(1)
@@ -48,22 +38,16 @@ else:
     VAULT_DIR = target_dir
     # print(VAULT_DIR)
 
+DELETE_DIR = Path(args.delpath)
+# print(DELETE_DIR)
+
+ORPHANED_FILE_EXTENSIONS = args.extensions
+SKIP_DIRS = [DELETE_DIR, ".obsidian"]
+
 dryRun = args.dryrun
 logToFile = args.logging
 printToScreen = args.print
-deleteFolderPath = args.delpath
-
-deltarget_dir = Path(args.delpath)
-
-DELETE_DIR = deltarget_dir
-# print(DELETE_DIR)
-
-
 hardKillMode = args.kill
-extensions = args.extensions
-
-SKIP_DIRS = [DELETE_DIR, ".obsidian"]
-
 
 
 def main():
