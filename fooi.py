@@ -92,7 +92,7 @@ def getDeletionList(embedLinkList, orphanedFileList):
     return deletionList
 
 
-def filterDirectories(fileType):
+def filterFiles(fileType):
     return [file for file in VAULT_DIR.rglob(f"*.{fileType}") if set(file.parts).isdisjoint(SKIP_DIRS)]
 
 
@@ -100,7 +100,7 @@ def getOrphanedFileList():
     orphanedFileList = []
     
     for fileType in ORPHANED_FILE_EXTENSIONS:
-        fileTypeList = filterDirectories(fileType)
+        fileTypeList = filterFiles(fileType)
         if len(fileTypeList) > 0:
             for file in fileTypeList:
                 orphanedFileList.append(file)
