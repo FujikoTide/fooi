@@ -3,19 +3,17 @@
 #
 
 # TODO:
-# add command line functionality
 # add error checking where needed
 # add dry run mode
+# create delete folder according to delete folder path specified
+# add hard kill mode
+# toggle printing to console
 
 import argparse
 import json
 from pathlib import Path
 import re
 
-# YOUR OBSIDIAN VAULT LOCATION GOES HERE !
-VAULT_DIR = Path(r"")
-DELETE_DIR = "DELETE"
-SKIP_DIRS = [DELETE_DIR, ".obsidian"]
 ORPHANED_FILE_EXTENSIONS = ["png", "jpg", "pdf", "webp"]
 
 
@@ -29,7 +27,18 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument("-p", "--path", required=False, default=Path.cwd())
 
-parser.add_argument("-d", "--dry-run", required=False, action="store_true", default=False)
+parser.add_argument("-dr", "--dryrun", required=False, action="store_true", default=False)
+
+parser.add_argument("-l", "--logging", required=False, action="store_false", default=True)
+
+parser.add_argument("-pr", "--print", required=False, action="store_true", default=False)
+
+parser.add_argument("-d", "--delpath", required=False, default="DELETE")
+
+parser.add_argument("-k", "--kill", required=False, action="store_true", default=False)
+
+parser.add_argument("-e", "--extensions", required=False, action="append")
+
 
 args = parser.parse_args()
 
@@ -40,42 +49,62 @@ if not target_dir.exists():
     raise SystemExit(1)
 else:
     VAULT_DIR = target_dir
-    print(VAULT_DIR)
+    # print(VAULT_DIR)
+
+dryRun = args.dryrun
+logToFile = args.logging
+printToScreen = args.print
+deleteFolderPath = args.delpath
+
+deltarget_dir = Path(args.delpath)
+
+DELETE_DIR = deltarget_dir
+# print(DELETE_DIR)
 
 
+hardKillMode = args.kill
+extensions = args.extensions
+
+print(args)
+
+SKIP_DIRS = [DELETE_DIR, ".obsidian"]
 
 
 
 def main():
-    deleteDir = Path(VAULT_DIR / DELETE_DIR)
     fileList = getFileList()
     embedLinkList = getEmbedList(fileList)
     orphanedFileList = getOrphanedFileList()
     deletionList = getDeletionList(embedLinkList, orphanedFileList)
-    logFiles(deleteDir, deletionList)
-    moveFiles(deleteDir, deletionList)
-    printFiles(deletionList)
+    if logToFile and not dryRun:
+        logFiles(deletionList)
+    if not dryRun:
+        createDir()
+        moveFiles(deletionList)
+    if printToScreen:    
+        printFiles(deletionList)
 
 
-def logFiles(deleteDir, deletionList):
+def createDir():
     try:
-        deleteDir.mkdir()
-        print(f"Directory {deleteDir} created successfully.")
+        DELETE_DIR.mkdir()
+        print(f"Directory {DELETE_DIR} created successfully.")
     except FileExistsError:
-        print(f"Directory {deleteDir} already exists.")
+        print(f"Directory {DELETE_DIR} already exists.")
     except PermissionError:
-        print(f"Permission denied: Unable to create {deleteDir}.")
+        print(f"Permission denied: Unable to create {DELETE_DIR}.")
     except Exception as e:
         print(f"An error occured: {e}")
 
-    with Path(deleteDir / "filesForDeletion.json").open("w", encoding="utf-8") as deletionFile:
+def logFiles(deletionList):
+    with Path(Path.cwd() / "filesForDeletion.json").open("w", encoding="utf-8") as deletionFile:
         json.dump(deletionList, deletionFile, indent=4, ensure_ascii=False)
 
 
-def moveFiles(deleteDir, deletionList):
+def moveFiles(deletionList):
     for file in deletionList:
         source = VAULT_DIR / file
-        destination = deleteDir / file
+        destination = DELETE_DIR / file
      
         try:
             with destination.open(mode="xb") as file:
