@@ -36,10 +36,8 @@ if not target_dir.exists():
     raise SystemExit(1)
 else:
     VAULT_DIR = target_dir
-    # print(VAULT_DIR)
 
 DELETE_DIR = Path(args.delpath)
-# print(DELETE_DIR)
 
 ORPHANED_FILE_EXTENSIONS = str(args.extensions).replace(",", "").split()
 SKIP_DIRS = [DELETE_DIR.name, ".obsidian", ".git"]
