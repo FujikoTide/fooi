@@ -85,17 +85,13 @@ def logFiles(deletionList):
 def moveFiles(deletionList):
     for file in deletionList:
         source = file
-        print(f"Checking if {source} exists")
         if not source.exists():
-            print(f"File {source} does not exist.")
             continue
         destination = DELETE_DIR / file.name
      
         try:
-            print(f"Attempting to move {source} to {destination}")
             shutil.move(source, destination)
         except Exception as e:
-            print(f"Error moving file to {destination}")
             raise e
 
 
