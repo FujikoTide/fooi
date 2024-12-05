@@ -22,9 +22,9 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument("path")
 parser.add_argument("delpath")
-parser.add_argument("-e", "--extensions", required=True, action="append")
+parser.add_argument("-e", "--extensions", required=True)
 parser.add_argument("-dr", "--dryrun", required=False, action="store_true", default=False)
-parser.add_argument("-l", "--logging", required=False, action="store_false", default=True)
+parser.add_argument("-l", "--logging", required=False, action="store_true", default=False)
 parser.add_argument("-pr", "--print", required=False, action="store_true", default=False)
 parser.add_argument("-k", "--kill", required=False, action="store_true", default=False)
 
@@ -41,8 +41,8 @@ else:
 DELETE_DIR = Path(args.delpath)
 # print(DELETE_DIR)
 
-ORPHANED_FILE_EXTENSIONS = args.extensions
-SKIP_DIRS = [DELETE_DIR, ".obsidian"]
+ORPHANED_FILE_EXTENSIONS = str(args.extensions).replace(",", "").split()
+SKIP_DIRS = [DELETE_DIR.name, ".obsidian", ".git"]
 
 dryRun = args.dryrun
 logToFile = args.logging
@@ -69,24 +69,24 @@ def main():
 
 def createDir():
     try:
-        DELETE_DIR.mkdir()
-        print(f"Directory {DELETE_DIR} created successfully.")
-    except FileExistsError:
-        print(f"Directory {DELETE_DIR} already exists.")
+        DELETE_DIR.mkdir(exist_ok=True)
     except PermissionError:
         print(f"Permission denied: Unable to create {DELETE_DIR}.")
     except Exception as e:
         print(f"An error occured: {e}")
 
 def logFiles(deletionList):
+    filePaths = []
+    for file in deletionList:
+        filePaths.append(Path(file).absolute().as_posix())
     with Path(Path.cwd() / "filesForDeletion.json").open("w", encoding="utf-8") as deletionFile:
-        json.dump(deletionList, deletionFile, indent=4, ensure_ascii=False)
+        json.dump(filePaths, deletionFile, indent=4, ensure_ascii=False)
 
 
 def moveFiles(deletionList):
     for file in deletionList:
-        source = VAULT_DIR / file
-        destination = DELETE_DIR / file
+        source = file
+        destination = DELETE_DIR / file.name
      
         try:
             with destination.open(mode="xb") as file:
@@ -95,17 +95,16 @@ def moveFiles(deletionList):
             print(f"File {destination} already exists.")
         else:
             source.unlink()
-        
-    print(f"Files to be deleted (moved to {DELETE_DIR} folder):\n")
 
 
 def printFiles(deletionList):
+    print(f"Files to be deleted (moved to {DELETE_DIR} folder):\n")
     for file in deletionList:
         print(file)
     
 
 def getFileList():
-    return list(VAULT_DIR.rglob("*.md"))
+    return filterFiles("md")
 
 
 def getEmbedList(fileList):
@@ -128,7 +127,7 @@ def getDeletionList(embedLinkList, prospectiveFileList):
     for embedFile in prospectiveFileList:
         file = Path(embedFile)
         if file.name not in embedLinkList:
-            deletionList.append(file.name)
+            deletionList.append(file)
     
     return deletionList
 
