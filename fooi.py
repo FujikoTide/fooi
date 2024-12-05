@@ -10,6 +10,7 @@ import argparse
 import json
 from pathlib import Path
 import re
+import shutil
 
 
 parser = argparse.ArgumentParser(
@@ -84,15 +85,18 @@ def logFiles(deletionList):
 def moveFiles(deletionList):
     for file in deletionList:
         source = file
+        print(f"Checking if {source} exists")
+        if not source.exists():
+            print(f"File {source} does not exist.")
+            continue
         destination = DELETE_DIR / file.name
      
         try:
-            with destination.open(mode="xb") as file:
-                file.write(source.read_bytes())
-        except FileExistsError:
-            print(f"File {destination} already exists.")
-        else:
-            source.unlink()
+            print(f"Attempting to move {source} to {destination}")
+            shutil.move(source, destination)
+        except Exception as e:
+            print(f"Error moving file to {destination}")
+            raise e
 
 
 def printFiles(deletionList):
